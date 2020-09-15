@@ -5,13 +5,25 @@
 'Description : This script check the status code of a URL.  
 '----------------------------------------------------------------------------------------------------------------------------  
 
+'CREATE TABLE [dbo].[McdServerProbe](
+'	[Sn] [int] IDENTITY(1,1) PRIMARY KEY,
+'	[TargetUrl] [nvarchar](100) NULL,
+'	[ResponseStatus] [int] NULL,
+'	[ResponseTime] [int] NULL,
+'	[ProbeTime] [datetime] NULL
+'	)
+
 
 'Initialization  Section     
 '----------------------------------------------------------------------------------------------------------------------------  
 Option Explicit  
 Dim objFSO, scriptBaseName, strPath
-Dim strTargetUrl
+Dim strTargetUrl, strTargetUrl2
+Dim urlStatus, respTime
+
 strTargetUrl = "https://www.google.com"
+strTargetUrl2 = "https://www.microsoft.com"
+
 '----------------------------------------------------------------------------------------------------------------------------  
 'Main Processing Section  
 '----------------------------------------------------------------------------------------------------------------------------  
@@ -21,6 +33,7 @@ On Error Resume Next
    strPath = objFSO.GetParentFolderName(Wscript.ScriptFullName)
 
    ProcessScript strTargetUrl
+   ProcessScript strTargetUrl2
 
    'Wscript.Echo "a test message line"
    Wscript.Echo "Err.Number is " & Err.Number
@@ -35,7 +48,6 @@ On Error Goto 0
 'Return     : None          ->      
 '----------------------------------------------------------------------------------------------------------------------------  
 Function ProcessScript(url)
-   Dim urlStatus  
    If Not EnumerateURLStatus(url, urlStatus) Then 
       Exit Function 
    End If 
@@ -47,7 +59,8 @@ Function ProcessScript(url)
       'Case Else 
          'Wscript.Echo "The status of the URL " & url & " is " & urlStatus, vbInformation, scriptBaseName  
 		 'Wscript.Echo "before write db1"
-         WriteIntoDb url, urlStatus
+		 'Wscript.Echo respTime
+         WriteIntoDb url, urlStatus, respTime
 
    'End Select 
 End Function 
@@ -65,8 +78,19 @@ Function EnumerateURLStatus(url, urlStatus)
       If Err.Number <> 0 Then 
          Exit Function 
       End If 
+	  'Wscript.Echo "xxx"
+	  Dim t,t2
+      t = Timer
+	
       objXML.open "GET", url, False 
       objXML.send  
+	  'Wscript.Echo "xxx"
+	  t2 = Timer
+
+	  'Wscript.Echo cstr(Cint((t2-t)* 1000)) & "ms"
+      respTime = Cint((t2-t)* 1000)
+	  'Wscript.Echo cstr(Cint((t2-t)* 1000)) & "ms"
+	  
       urlStatus = CInt(objXML.Status)  
       If Err.Number <> 0 Then 
          Exit Function 
@@ -93,8 +117,8 @@ End Function
 '	";Uid=" & uid & _
 '	";Pwd=" & pwd & ";"
 '
-Sub WriteIntoDb(vUrl, vUrlStatus)
-	Dim Conn, rs
+Sub WriteIntoDb(vUrl, vUrlStatus, respTime)
+	Dim Conn, rs, sql
 	Set Conn = CreateObject("ADODB.Connection")
 	Conn.ConnectionString = "Provider=SQLNCLI11;" _
 			 & "Server=(local);" _
@@ -106,8 +130,10 @@ Sub WriteIntoDb(vUrl, vUrlStatus)
 	Conn.Open
 	
 	'Wscript.Echo "before write db"
-
-	Set rs = Conn.EXECUTE("INSERT INTO McdServerProbe(TargetUrl,ResponseStatus,ProbeTime) VALUES('" & vUrl & "','" & vUrlStatus & "','" & DateTimeConvert(NOW,4,1) & "')")
+	
+	sql = "INSERT INTO McdServerProbe(TargetUrl,ResponseStatus,ResponseTime,ProbeTime) VALUES('" & vUrl & "'," & Cstr(vUrlStatus) & "," & Cstr(respTime) & ",'" & DateTimeConvert(NOW,4,1) & "')"
+	'Wscript.Echo sql
+	Set rs = Conn.EXECUTE(sql)
 
 	Set rs = Nothing
 	Set Conn = Nothing
