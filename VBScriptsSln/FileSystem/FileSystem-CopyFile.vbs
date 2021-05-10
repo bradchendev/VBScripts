@@ -8,7 +8,8 @@ Option Explicit
 ' Output: none
 '
 ' For Example
-'CopyAndOverrideToRemoteServer "D:\Backup\20070815-2.bak", "D:\20070815.bak"
+'CopyAndOverrideToRemoteServer "D:\Backup\20070815-2.bak", "D:\"
+'CopyAndOverrideToRemoteServer "D:\Backup\20070815-2.bak", "D:\20070815_2.bak"
 '
 Sub CopyAndOverrideToRemoteServer(SourceFile,Destinationfile)
 	Dim ofile
