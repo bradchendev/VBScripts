@@ -1,3 +1,5 @@
+' also work with UNC Path 
+
 Function ReportFolderStatus(fldr)
    Dim fso, msg
    Set fso = CreateObject("Scripting.FileSystemObject")

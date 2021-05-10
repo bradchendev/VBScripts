@@ -3,4 +3,5 @@ Set folder = fso.GetFolder("C:\Windows")
 Set files = folder.Files
 For each fileIdx In files
 	Wscript.Echo fileIdx.Name
+	'Wscript.Echo fileIdx.Path
 Next
