@@ -7,15 +7,17 @@
 'sp_server_diagnostics (Transact-SQL)
 'https://docs.microsoft.com/zh-tw/sql/relational-databases/system-stored-procedures/sp-server-diagnostics-transact-sql?view=sql-server-ver15
 '
-'CREATE TABLE SpServerDiagnosticsResult  
-'(  
-'      create_time DateTime,  
-'      component_type sysname,  
-'      component_name sysname,  
-'      state int,  
-'      state_desc sysname,  
-'      data xml  
-');  
+'CREATE TABLE [dbo].[SplDiagD18DWA01](
+'	[Sn] [bigint] IDENTITY(1,1) NOT NULL,
+'	[create_time] [datetime] NULL,
+'	[component_type] [sysname] NOT NULL,
+'	[component_name] [sysname] NOT NULL,
+'	[state] [int] NULL,
+'	[state_desc] [sysname] NOT NULL,
+'	[data] [xml] NULL,
+' CONSTRAINT [Cldx_PK_SplDiagD18DWA01] PRIMARY KEY CLUSTERED 
+'	([Sn] ASC)
+')
 'INSERT INTO SpServerDiagnosticsResult  
 'EXEC sp_server_diagnostics;
 '
